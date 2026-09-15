@@ -5,6 +5,8 @@ This Project focuses on a dataset on AI skills in requirements for IT Jobs.
 
 ## About my Dataset
 My dataset has 8 columns(non ai/ai job listings, required skill count, job category, tier, etc) and over 2500 records. 
+[AI Skill Requirement Kaggle Dataset](https://www.kaggle.com/datasets/datamatastudios/ai-requirements-index)
+
 
 ## Analysis Goal:
 My final goal I am trying to find out is how the different IT categories focus on different AI skill levels/types (machine learning ,Gen AI, any AI) along with the amount of job listings of each. 
@@ -16,3 +18,6 @@ I assume that the Data Job Category will have the second highest (as AI would be
 
 ## Null Hypothesis:
 The AI required skill count will not differ from the other job categories.
+
+## R Markdown HTML File
+[Rpubs Link](http://rpubs.com/Taylor187/1456805)
