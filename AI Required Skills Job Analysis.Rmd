@@ -1,0 +1,118 @@
+---
+title: "AI Required Skills Job Analysis"
+author: "Taylor Mcrae"
+date: "2026-09-07"
+output: html_document
+---
+
+Hypothesis:
+I assume that the Data Job Category will have the second highest (as AI would be the highest) required AI skill count compared to the other job categories.
+
+Null Hypothesis:
+The AI required skill count will not differ from the other job categories.
+
+## Part 1: Data Loading and Visualization
+Here I began by first loading my datasaet on AI required skills in the IT job market and visualizing the raw counts. I filtered the dataset by excluding the AI job category as that would be the highest in all AI related analysis (based on relevance to the matter) to allow for less skewed results in the scatter plot. 
+
+```{r}
+# Load Data Set
+ai_job_skills <- read.csv("ai-requirements-index.csv")
+
+# Creates a dataset that excludes the AI Job category
+non_ai_jobs <- subset(ai_job_skills, category != "ai")
+
+# Scatter Plot showing non AI job category listings with AI vs Required Skill Counts
+plot(non_ai_jobs$listings_with_ai, non_ai_jobs$required_count,xlab = "Ai Listings", ylab = "Required Skill count", main = "AI Listings vs. Required Skill Count", col = "darkblue", cex = 1.2)
+```
+
+Explanation: The scater plot created shows a strong positive linear relationship between AI listings and the Required AI Skill counts suggesting a strong relationship between the two variables. This also further suggests AI skills are a required aspect in almost all AI job listings which serves as a good predictor in what IT job categories require AI skills the most with future analysis that will be done on the matter.
+
+## Part 2: Simple Statistical Mean Calculation with Visualization
+
+I then continued the analysis by finding the overall job category mean required AI skill count before splitting each category to find each seperate mean then plotting the results.
+
+```{r}
+# Summary of all job category required count (min, max, mean, etc)
+summary(non_ai_jobs$required_count)
+
+# Calculates the Mean Required AI Skill counts for each Job Category
+category_means <- aggregate(required_count ~ category, data = non_ai_jobs, FUN = mean )
+print("Mean Required AI Skill Count for each Job Category")
+print(category_means)
+
+# Bar Plot showing each IT Job category Mean Required AI skill count
+barplot(category_means$required_count, 
+        names.arg = category_means$category,
+        col = "skyblue",
+        xlab = "Job Category", 
+        ylab = "Mean Required AI Skill Count",
+        main = "Average AI Skill Demand by Non-AI Job Category")
+```
+Explanation: Based on the bar plot of each mean I actually found that engineering had a higher mean suggesting it had the most required AI skills in IT jobs at 231.34 (second only to the aforementioned AI Job Category). The Data Job category however was the second highest at a count of 135.05 suggesting that the category still had strong importance on AI skills in its jobs. A improtant point to consider however is the size of the engineering sector may also be skewing the results (more overall job listings leading to more AI listings that require AI skills) which will be considered and tested further in this paper.
+
+
+## Part 3: Simple Statistical Mean Calculation with Visualization
+
+I wanted to further see the relationship/correlation between AI listings and required count so I did a correlation test along with a Linear Regression Model on them. I also did the same between Total listings and required count to compare the results
+
+```{r}
+# Test to see if there's correlation between AI listings and required count for non AI job categories
+cor.test(non_ai_jobs$listings_with_ai, non_ai_jobs$required_count)
+
+# Linear Regression Model: AI Listings vs Required Skills
+required_listings.lm <- lm(formula = required_count ~ listings_with_ai , data = non_ai_jobs)
+plot(non_ai_jobs$listings_with_ai, non_ai_jobs$required_count,xlab = "Ai Listings", ylab = "Required Skill count", main = "AI Listings vs. Required Skill Count", col = "darkblue", cex = 1.2)
+abline(required_listings.lm, col = "red", lwd = 2)
+
+
+
+# Test to see if there's correlation between total listings and required count (baseline for former test)
+cor.test(non_ai_jobs$total_listings, non_ai_jobs$required_count)
+
+# Additional test on Total Listings vs Required Skills
+required_total_listings.lm <- lm(formula = required_count ~ total_listings , data = non_ai_jobs)
+plot(non_ai_jobs$total_listings, non_ai_jobs$required_count,xlab = "Total Listings", ylab = "Required Skill count", main = "total Listings vs. Required Skill Count")
+abline(required_total_listings.lm, col = "red", lwd = 2)
+
+```
+Explanation: Based on the following correlation and scatter plots/Linear regression models I once again saw a strong correlation between Ai listings and Ai required skills being listed in non AI job listings (to be expected) at a overall correlation of 0.9996. However in the Total listing vs Required Count correlation test I found a slight weaker but still strong correlation of 0.8556 suggesting that total listings also have a strong correlation with Ai skills being required. This suggests that in the current IT job market not only are Ai listings requiring AI skills on job listings but also some non AI listings suggesting AI skills are becoming more common to be a needed requirement in the job market and in particular in Engineering and Data categories.
+
+
+## Part 4: Histogram Distribution
+
+I looked further in to the AI required skill count column with a histogram on its overall distribution
+
+```{r}
+# Histogram showing frequency of Required AI Skill Counts
+hist(non_ai_jobs$required_count, breaks = 20, xlab = "Required AI Skill Count", ylab = "Frequency", main = " Distribution of Required AI Skill Count",col = "darkseagreen")
+```
+Explanation: I found the distribution to be overall right skewed suggesting that the bigger IT job categories (engineering in particular) dont actually make up the most common range of required AI skills in job listing (which is 1-60 based on the histogram). This suggests that the high volume AI skill demands need to be further investigated beyond just raw numbers as proportionally the AI skill count could tend to a lower volume overall than shown in the histogram (with smaller IT categories possibly having a large proportion of listings requiring AI skills). 
+
+
+## Part 5: T-test between Engineering and Data Job Category Means
+To further investigate the idea of proportionally analyzing the data possibly providing a better overall grasp on how required AI skills are in the top two IT job categories I did a t-test non- proportionally and proportionally adjusting the data based on total listings to compare both categories means. 
+
+```{r}
+# T-test comparing means of Engineering and Data Job categories
+data_reqCounts <- subset(non_ai_jobs, category == "data")$required_count
+engineering_reqCounts <- subset(non_ai_jobs, category == "engineering")$required_count
+
+reqCounts_ttest <- t.test(engineering_reqCounts, data_reqCounts)
+print(reqCounts_ttest)
+
+
+# New column that proportionally measures required count (for t-test)
+non_ai_jobs$skills_per_job <- non_ai_jobs$required_count / non_ai_jobs$total_listings
+
+# Proportional t-test comparing means of Engineering and Data Job categories
+data_adjusted_reqCounts <- subset(non_ai_jobs, category == "data")$skills_per_job
+engineering_adjusted_reqCounts <- subset(non_ai_jobs, category == "engineering")$skills_per_job
+
+proportion_ttest <- t.test(engineering_adjusted_reqCounts, data_adjusted_reqCounts)
+print(proportion_ttest)
+```
+
+Explanation: Based on the two t tests I found the firstly non proportionally that Engineering has a statistically higher mean Required AI skill count(231.34) over the Data job category (135.05) whith the test being overall statiscially significant with a p value of 1-361e-11. This expounds on my previous findings that the Engineering job category is the catewgory with the most job listings requiring AI skills (possibly due to volume alone). The second t-test which was done to see how each compared proportionally however did give results suggesting that the Data job category was has a slighty higher mean proportionally however the p-value of 0.1413 suggests that this is statiscally non-significant which could be due to random noise/variance in the dataset. Based on these two tests a conclusion can be reached that Engineering beats out the Data job category in requiring AI skills in job listings.
+
+
+Conclusion: Based on all these findings my original hypothesis of the Data job category outpacing all the other non AI job categories is not supported. While proportinally comparing the top two categories (Data and Engineering) lead to a similar comparable mean amount the p-value (0.1413) is greater than the significance threshold of 0.05 leading to the test being statiscally non-significant. However both job categories are the leading job categories in requiring AI skills with each dwarfing lower tier categoies like Devops or Security.
