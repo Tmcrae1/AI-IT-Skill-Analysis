@@ -1,11 +1,13 @@
-<!-- This example is from d3indepth.com -->
+<!-- This example is from d3indepth.com  -->
 
 <html>
     <head>
         <title>External Script Example</title>
-        <script type="module" src="script.js"></script>
+        <!-- 🟢 FIXED: Changed src to point inside the dist folder -->
+        <script type="module" src="./dist/script.js"></script>
     </head>
     <body>
+        <!-- 🟢 SVG container with ample dimensions for your multipliers -->
         <svg width="1300" height="500"></svg>
     </body>
 </html>
