@@ -23,4 +23,4 @@ The AI required skill count will not differ from the other job categories.
 [Rpubs Link](http://rpubs.com/Taylor187/1456805)
 
 ## My CodePen Visualization
-[CodePen Visualization](https://github.com/Tmcrae1/AI-IT-Skill-Analysis/tree/main/src)
+[CodePen Visualization](https://github.com/Tmcrae1/AI-IT-Skill-Analysis/tree/main/dist)
